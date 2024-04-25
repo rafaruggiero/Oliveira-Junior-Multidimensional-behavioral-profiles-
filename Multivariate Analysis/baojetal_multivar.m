@@ -12,9 +12,15 @@
 %   Note that for analyses based on randomly selecting partitioned data, 
 %   the results may slightly vary between runs.
 % 
-% Author: Danilo Benette Marques, 2019-2024. Department of Neurosciences 
-%   and Behavioral Sciences, Ribeirão Preto School of Medicine, University
-%   of São Paulo
+% Authors: Danilo Benette Marques, Benedito Alves de Oliveira Júnior,
+%   Rafael Naime Ruggiero (2019-2024).
+% Acknowledgments: This script was primarily created by Danilo Benette
+%   Marques and was significantly developed, thoroughly tested, and 
+%   discussed with Benedito Alves de Oliveira Júnior and Rafael Naime 
+%   Ruggiero.
+% 
+% Institution: Department of Neurosciences and Behavioral Sciences, 
+%   Ribeirão Preto Medical School, University of São Paulo.
 
 %% Load and set data for multivariate analysis
 clear all
