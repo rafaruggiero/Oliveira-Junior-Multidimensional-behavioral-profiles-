@@ -1,22 +1,25 @@
-% Codes for generate figures 2, S3, S4 and S5
-% Authors: Benedito A. de Oliveira-Júnior & Rafael N. Ruggiero
-% 2024
+% % CODE FOR UNIVARIATE AND MULTIVARIATE ANALYSIS OF BEHAVIORAL VARIABLES TO GENERATE FIGURES 2, S3, S4 AND S5
+% 
+% Used in the article: Oliveira-Junior et al. Multidimensional behavioral 
+%   profiles associated with resilience and susceptibility after 
+%   inescapable stress. Scientific Reports (2024).
+% 
+% OBS.: To run this script, you must use the data from the 'Data_Table.xlsx' file, 
+% available at: https://osf.io/mgknc, and add the 'utilities_script2' folder to the path.
+%
+% Authors: Benedito Alves de Oliveira-JÃºnior, Danilo Benette Marques & Rafael N. Ruggiero
+% (2019-2024)
 
 %% Initial data processing
-
 [ndata, tdata, alldata] = xlsread('Data_Table.xlsx'); % The file can be found in the OSF repository
 textdata = tdata(:,2:end);
-
 [idx_row, idx_col]=find(isnan(ndata));   % Finding NaN values indexes
-
 NANinfo = (alldata(1, idx_col+1));
 NANinfo(2,:) = (alldata(idx_row+1, 2))';
 NANinfo(3,:) = (alldata(idx_row+1, 1))';           
 
 % Replacing NaN values by column median for each experimental group
-
 numdata=ndata;
-
 for i = 1:length(idx_row)                        
     
     if numdata(idx_row(i),1)==1
@@ -27,11 +30,9 @@ for i = 1:length(idx_row)
       
     end
 end
-
 clearvars -except alldata numdata textdata
 
-%% Variable selection and data standardizatio
-
+%% Variable selection and data standardization
 % The most representative data for each test of interest (6/101 variables)
 prindata = numdata(:,[1 6 31 51 54 97 98]); % The 6 principal behavioral measures
 prindata_noZ = prindata; % without zscore
@@ -40,22 +41,16 @@ prindata_label = textdata(1,[1 6 31 51 54 97 98]);
 
 %% Codes for Figure 2, panels 2I and 2J
 % Clustering Resistant vs Helpless
-
 C_data = numdata(:,[1 98 101]); % Selecting Variables: Latency to Escape and Escape Failures
 C_data(:,2:end) = zscore(C_data(:,2:end)); 
-
 evalK = evalclusters(C_data(:,2:end),'kmeans','silhouette','klist',1:4), figure, plot(evalK)
-
 rng('default') % For reproducibility
 [idx_kcluster,Kcentroids,sumD] = kmeans(C_data(:,2:end),2,'Replicates',100,'Display','final');
-
-% idx_kcluster -> 2==Helpless, 1==Resistant
 
 % Manually changing classes for easier identification
  idx_kcluster(find(idx_kcluster==2))=20;
  idx_kcluster(find(idx_kcluster==1))=2;
  idx_kcluster(find(idx_kcluster==20))=1;
-% 1==Helpless, 2==Resistant
 
 % To evaluate the silhouette value
 silhouette(C_data(:,2:end),idx_kcluster)
@@ -74,44 +69,32 @@ hold on, scatter(C_data(idx_kcluster(:,1)==2,2),C_data(idx_kcluster(:,1)==2,3), 
 legend('H', 'NH', 'location', 'southeast', 'box', 'off')
 xlabel('Escape failures (Z-score)'), ylabel('Mean latency to escape (Z-score)'), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
-% print -dpdf -painters Sillhuette
 
-
-% X²
+% Xï¿½
 [tbl,chi2,pchi2] = crosstab(prindata(:,1),idx_kcluster); pchi2
-
 figure,b=bar(tbl(:,1:2)',1); set(b,'linewidth',1.5)
 b(1).FaceColor = [0.1 0.1 0.1];
 b(2).FaceColor = [1 0.5 0];
 l1 = legend({'NS','IS'},'box','off');
 ylabel('Individuals'), xlabel('Cluster'), set(gcf,'color','white')
-%print -dpdf -painters clustX2
-
-
 clearvars -except alldata numdata textdata prindata prindata_noZ prindata_label idx_kcluster
 
 %% Codes for Figure S3
-
 % Test for multicollinearity
 v=vif(prindata(:,2:end)); 
 bar(v,0.5,'white'), set(gcf, 'color','white'), ylabel('VIF Values')
 set(gca,'XTickLabel',prindata_label(1,2:end),'TickDir','out', 'YLim', [0 1.5], 'YTick', 0:0.5:1.5)
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
-% print -dpdf -painters Vif_values
 clearvars -except alldata numdata textdata prindata prindata_noZ prindata_label idx_kcluster
 
-
 % Principal Component Analysis (PCA)
-
 x = prindata; varslabel = prindata_label % 6/101 variables
-
 [PCcoef, PCscore, PCvar, ~, PCexpvar, Emean] = pca(x(:,2:end)); % pca(prindata(find(idx_kcluster==1),:))
 
 % Explained Variance
 figure, plot(PCexpvar(1:size(PCexpvar,1)),'k','linewidth',2);
 set(gca,'box','off'), xlabel('Principal Components (PCs)', 'FontWeight','bold'), ylabel('Explained Variance (%)','FontWeight','bold'); 
 set(gcf,'color','white'), set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
-
 
 % PCs vs. individuals (IS x NS)
 ind = [PCscore(x(:,1)==1,1); PCscore(x(:,1)==0,1)];
@@ -123,19 +106,14 @@ figure,
 subplot(1,3,1), boxplot(ind,g), title('PC1','Fontsize',12), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
 ylim([-3 3]), ylabel('PC Scores')
-
 clear ind, ind = [PCscore(x(:,1)==1,2); PCscore(x(:,1)==0,2)];
-
 subplot(1,3,2), boxplot(ind,g), title('PC2','Fontsize',12), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
 ylim([-3 3])
-
 clear ind, ind = [PCscore(x(:,1)==1,3); PCscore(x(:,1)==0,3)];
-
 subplot(1,3,3), boxplot(ind,g), title('PC3','Fontsize',12), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
 ylim([-3 3])
-%print -dpdf -painters PCA_ISvsNS
 
 % Stats (IS x NS)
 for i=1:3 % PCs
@@ -156,24 +134,18 @@ ind = [PCscore(idx_kcluster==1,1); PCscore(idx_kcluster==2,1)];
 g1 = repmat({'H'},length(find(idx_kcluster==1)),1);
 g2 = repmat({'NH'},length(find(idx_kcluster==2)),1);
 g = [g1; g2];
-
 figure, 
 subplot(1,3,1), boxplot(ind,g), title('PC1','Fontsize',12), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
 ylabel('PC scores'), ylim([-3 3])
-
 clear ind, ind=[PCscore(idx_kcluster==1,2); PCscore(idx_kcluster==2,2)]
-
 subplot(1,3,2), boxplot(ind,g), title('PC2','Fontsize',12), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
 ylim([-3 3])
-
 clear ind, ind=[PCscore(idx_kcluster==1,3); PCscore(idx_kcluster==2,3)]
-
 subplot(1,3,3), boxplot(ind,g), title('PC3','Fontsize',12), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
  ylim([-3 3])
-
 clear ind, ind=[PCscore(idx_kcluster==1,4); PCscore(idx_kcluster==2,4)]  
 
 % Stats (H x NH)
@@ -264,25 +236,21 @@ set (gcf, 'position', [300 45 570 630])
     legend({'H', 'NH'}, 'location', 'northwest'), %grid;
     set(gcf,'color','white'), set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
     set (gcf, 'position', [300 65 700 600]);
-    % print -dpdf -painters PC3_HelRes
-
 clearvars -except alldata numdata textdata prindata prindata_noZ prindata_label idx_kcluster
 
 %% Codes for figure S4
 % Clustering Multivariated Phenotypes 
-
 for i=1:1000
     evalK = evalclusters(prindata(:,2:end),'kmeans','silhouette','klist',2:10); %figure, plot(evalK)
     nK(i) = evalK.OptimalK;
 end
 histogram(nK), xlabel('Optimal number of clusters'), ylabel('Iterations (1000)')
 set(gcf,'color','white'), set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
-%print -dpdf -painters kmeans_iterations1000
 
+% K-means clustering
 rng(2) % For reproducibility
-k=6
+k=6 % Number of clusters
 idx_multicluster = kmeans(prindata(:,2:end),k,'replicates',1000,'Display','final');
-
 silhouette(prindata(:,2:end),idx_multicluster)
 [s,h]=silhouette(prindata(:,2:end),idx_multicluster);
 s_value=mean(s)
@@ -296,13 +264,11 @@ altposition(find(altposition==4))=40; altposition(find(altposition==1))=50; altp
 altposition(find(altposition==10))=1; altposition(find(altposition==20))=2; altposition(find(altposition==30))=3;
 altposition(find(altposition==40))=4; altposition(find(altposition==50))=5; altposition(find(altposition==60))=6;
 silhouette(prindata(:,2:end),altposition)
-
 c_seq = [4 5 6 2 3 7];
 prindata_seq = prindata(:,c_seq);
 for i=1:k
     c_seq_label(i) = prindata_label(:,c_seq(i))
 end
-
 
 figure
 for i=1:k
@@ -324,9 +290,8 @@ set(gcf, 'position', [450    45   304   704])
 % the hierarchical clusters, the code for which can be found in the main script.
 
 
-% CHI²
+% CHIï¿½
 [tbl,chi2,pchi2] = crosstab(prindata(:,1),idx_multicluster);
-
 figure,b=bar(tbl(:,idxclust)',1); set(b,'linewidth',1.5)
 b(1).FaceColor = [0 0 1];
 b(2).FaceColor = [1 0 0];
@@ -334,17 +299,14 @@ legend({'NS','IS'},'box','off');
 ylabel('Individuals'), xlabel('Cluster'), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
 ylim([0 10])
-%print -dpdf -painters x2_ISNS_kmeans
 
 [tbl,chi2,pchi2] = crosstab(idx_kcluster,idx_multicluster); pchi2
-
 figure,b=bar(tbl(:,idxclust)',1); set(b,'linewidth',1.5)
 b(1).FaceColor = [0 0 0];
 b(2).FaceColor = [0.2 0.8 0.2];
 l1 = legend({'H','NH'},'box','off');
 ylabel('Individuals'), xlabel('Cluster'), set(gcf,'color','white')
 set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')
-%print -dpdf -painters x2_HelRes_kmeans
 
 % Clusters mean and confidence intervals
 for i=1:k
@@ -358,16 +320,13 @@ for i=1:k
     clustermean(i,:) = mean(prindata(altposition==i,2:7),1) 
     clusterSEM(i,:) = std(prindata(altposition==i,2:7))/sqrt(size(prindata(altposition==i,2:7),1)) % SEM
 end
-
 clearvars -except alldata numdata textdata prindata prindata_label idx_kcluster
 
 %% Codes for Figure 2 - Panels 2A-H (univariate violin plots)
-
 % IS vs. NS
 g1 = repmat({'IS'},length(find(numdata(:,1)==1)),1);
 g2 = repmat({'NS'},length(find(numdata(:,1)==0)),1);
 groups_ISNS = [g1; g2];
-
 
 % H vs. R
 groups_NH = cell(length(idx_kcluster),1);
@@ -400,17 +359,13 @@ for i=1:size(univar,2)
     vp(1).ViolinColor = [0.5 0.5 0.5]; % H
     vp(2).ViolinColor = [0.2 0.8 0.2]; % NH
     set(gca,'fontname','helvetica','fontsize',12,'linewidth',1.5,'xcolor','k','ycolor','k','box','off')  
-
     set(gcf,'color','white', 'position', [300 200 770 340])
 
 end
-%print -dpdf -painters violinplot_SIratio
-
 clearvars -except alldata numdata textdata ...
     prindata prindata_label idx_kcluster univar univar_label ylabels groups_ISNS groups_NH
 
 % Statistics
-
     %IS vs NS
     for i=1:size(univar,2)
     [h,~] = kstest2(univar(prindata(:,1)==1,i),univar(prindata(:,1)==0,i));
@@ -457,11 +412,8 @@ clearvars -except alldata numdata textdata ...
     end
 
 %% Codes for Figure 5 (Studies using similar protocols)
-
 [ndata, ~, alldata] = xlsread('Studies_similar_protocols.xlsx'); % The file can be found in the OSF repository
-
 [idx_row, idx_col]=find(isnan(ndata));
-
 OF = mean(ndata(1:3,:),1,'omitnan');
 FS = mean(ndata(4,:),1,'omitnan');
 SoP = mean(ndata(5:10,:),1,'omitnan');
@@ -473,7 +425,6 @@ data=[OF;FS;SoP;EPM;SuP;EF];
 data(isnan(data))=0;
 [lin, col]=find(data==0)
 
-
 data(1,:)=data(1,:)*3
 data(2,:)=data(2,:)*1
 data(3,:)=data(3,:)*1
@@ -481,28 +432,18 @@ data(4,:)=data(4,:)*4
 data(5,:)=data(5,:)*1
 data(6,:)=data(6,:)*4
 
-
 lin=[1 4 3 2 5 6];
 for i=1:6
     datax(lin(i),:)=data(i,:);
 end
-
 for i=1:6
 datax(i,:)=smoothdata(datax(i,:),'SmoothingFactor',0.25);
 end
 figure, imagesc(datax), colormap redblue, c=colorbar;
 
-%for i=1:41
-%data(lin(i),col(i))=0;
-%end
-%figure, imagesc(data), colormap redblue, c=colorbar;
-
 label = ({'1 day', '2 days','3 days','<6 days','1 week','2 weeks','3 weeks','4 weeks'})
 set(gca,'XTick',1:8,'XTickLabel',label,'XTickLabelRotation',-45)
-
 labely=({'OF','FS','SoP','EPM','SuP','EF'});
 set(gca,'YTick',1:6,'YTickLabel',labely(lin))
-
 set(gca,'fontname','helvetica','fontsize',10,'linewidth',1.5,'xcolor','k','ycolor','k','box','on')
 set(gcf,'color','white')
-
