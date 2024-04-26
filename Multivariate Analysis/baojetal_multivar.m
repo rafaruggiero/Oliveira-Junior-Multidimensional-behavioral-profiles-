@@ -77,11 +77,6 @@ testcolor = [1 .5 .25; 0.25 .75 1; .8 0 0; .5 0 1; .5 1 .5 ; 1 .5 .5; 1 .9 0; .7
 
 %Identify groups NS and IS
 idx_group = table2array(TBL(:,2)); %NS(0), IS(1)
-
-% %% Exclusion by technical issues
-idx_exclude = [12 25]; 
-    DATA(idx_exclude,:) = [];
-    idx_group(idx_exclude,:) = [];
     
 % %% Identify helpless (H) and non-helpless (NH)
 rhdata = DATA(:,[97 100]); %shuttle box escape performance measures
