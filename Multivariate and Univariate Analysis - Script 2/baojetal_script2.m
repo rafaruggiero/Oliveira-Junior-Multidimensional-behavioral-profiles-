@@ -1,14 +1,13 @@
 % % CODE FOR UNIVARIATE AND MULTIVARIATE ANALYSIS OF BEHAVIORAL VARIABLES TO GENERATE FIGURES 2, S3, S4 AND S5
 % 
 % Used in the article: Oliveira-Junior et al. Multidimensional behavioral 
-%   profiles associated with resilience and susceptibility after 
-%   inescapable stress. Scientific Reports (2024).
+% profiles associated with resilience and susceptibility after 
+% inescapable stress. Scientific Reports (2024).
 % 
 % OBS.: To run this script, you must use the data from the 'Data_Table.xlsx' file, 
 % available at: https://osf.io/mgknc, and add the 'utilities_script2' folder to the path.
 %
-% Authors: Benedito Alves de Oliveira-Júnior, Danilo Benette Marques & Rafael N. Ruggiero
-% (2019-2024)
+% Authors: Benedito Alves de Oliveira-Júnior, Danilo Benette Marques & Rafael Naime Ruggiero % (2019-2024)
 
 %% Initial data processing
 [ndata, tdata, alldata] = xlsread('Data_Table.xlsx'); % The file can be found in the OSF repository
